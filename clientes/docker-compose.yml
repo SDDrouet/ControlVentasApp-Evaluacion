@@ -1,0 +1,46 @@
+services:
+  clientes_api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3002"
+    environment:
+      - DB_HOST=postgres_clientes
+      - DB_NAME=postgres
+      - DB_USER=postgres
+      - DB_PASS=postgres
+      - PORT=3002
+      - DB_PORT=5432
+    networks:
+      - ventas-network
+    depends_on:
+      postgres_clientes:
+        condition: service_healthy
+
+  postgres_clientes:
+    image: postgres:14-alpine
+    ports:
+      - 5438:5432
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - pgdata_clientes:/var/lib/postgresql/data
+    networks:
+      - ventas-network
+
+volumes:
+  pgdata_clientes:
+
+
+networks:
+  ventas-network:
+    driver: bridge
+
