@@ -38,8 +38,6 @@ services:
 
 
 
-
-
   clientes_api:
     build:
       context: ./clientes
@@ -78,7 +76,6 @@ services:
       - ventas-network
 
   
-
 
   ventas:
     build:
@@ -122,6 +119,23 @@ services:
       - pgdata_ventas:/var/lib/postgresql/data
     networks:
       - ventas-network
+
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_INVENTARIO_HOST=localhost
+      - REACT_APP_CLIENTE_HOST=localhost
+      - REACT_APP_VENTAS_HOST=localhost
+    networks:
+      - ventas-network
+    depends_on:
+      ventas:
+        condition: service_started
 
 volumes:
   pgdata_clientes:
